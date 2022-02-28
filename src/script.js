@@ -6,62 +6,77 @@ import * as dat from 'dat.gui'
 
 const gui = new dat.GUI();
 
-// Use Image
-// const image = new Image()
-// const texture = new THREE.Texture(image)
-// image.onload = () => {
-//     texture.needsUpdate = true;    
-// }
-
-// image.src = "Wood_Panel_003/basecolor.jpg"
-
-const loadingManager = new THREE.LoadingManager();
-loadingManager.onStart = () => {
-    console.log('start')
-}
-
-loadingManager.onLoaded = () => {
-    console.log('loaded')
-}
-
-loadingManager.onProgress = () => {
-    console.log('progress')
-}
-
-loadingManager.onError = () => {
-    console.log('error')
-}
+const textureLoader = new THREE.TextureLoader()
+const doorColorTexture = textureLoader.load("textures/door/color.jpg")
+const doorAlphaTexture = textureLoader.load("textures/door/alpha.jpg")
+const doorAmbientOcclusionTexture = textureLoader.load("textures/door/ambientOcclusion.jpg")
+const doorHeightTexture = textureLoader.load("textures/door/height.jpg")
+const doorNormalTexture = textureLoader.load("textures/door/normal.jpg")
+const doorMetalnessTexture = textureLoader.load("textures/door/metalness.jpg")
+const doorRoughnessTexture = textureLoader.load("textures/door/roughness.jpg")
+const matcapTexture = textureLoader.load("textures/matcaps/3.png")
+const gradientTexture = textureLoader.load("textures/gradients/3.jpg")
+gradientTexture.magFilter = THREE.NearestFilter
 
 
-const textureLoader = new THREE.TextureLoader(loadingManager)
-const texture = textureLoader.load("Wood_Panel_003/basecolor.jpg")
-// texture.repeat.x = 2
-// texture.repeat.y = 3
+const cubeTextureLoader = new THREE.CubeTextureLoader()
+const environmentMapTexture = cubeTextureLoader.load([
+    'textures/environmentMaps/0/px.jpg',
+    'textures/environmentMaps/0/nx.jpg',
+    'textures/environmentMaps/0/py.jpg',
+    'textures/environmentMaps/0/ny.jpg',
+    'textures/environmentMaps/0/pz.jpg',
+    'textures/environmentMaps/0/nz.jpg',
+])
 
-// texture.offset.x = 0.2
-// texture.rotation = 1
-// texture.center.x = 0.5
-
-// texture.wrapS = THREE.MirroredRepeatWrapping
-// texture.wrapT = THREE.RepeatWrapping
-
-texture.magFilter = THREE.LinearFilter
 
 const canvas = document.querySelector('.webgl')
 
-const scene = new THREE.Scene();
+const scene = new THREE.Scene(); 
 
 const geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2)
-
-const material = new THREE.MeshBasicMaterial({
+const material = new THREE.MeshStandardMaterial({
     // color: 0xff0000
-    map: texture
+    metalness: 0.7,
+    roughness: 0.2,
+    envMap: environmentMapTexture,
+    // map: doorColorTexture,
+    // aoMap: doorAmbientOcclusionTexture,
+    // transparent: true,
+    // displacementMap: doorHeightTexture,
+    // displacementScale: 0.05,
+    // roughnessMap: doorRoughnessTexture,
+    // normalMap: doorNormalTexture,
+    // alphaMap: doorAlphaTexture,
+
+    // side: THREE.BackSide
+    
+    // matcap: matcapTexture
 
     // wireframe: true
+    // shininess: 100,
+    // specular: 'red'
+    // gradientMap: gradientTexture
 })
 
-const mesh = new THREE.Mesh(geometry, material);
-scene.add(mesh)
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+scene.add(ambientLight)
+
+const pointLight = new THREE.PointLight(0xffffff, 0.5)
+pointLight.position.set(2, 3, 4)
+scene.add(pointLight)
+
+
+const sphere = new THREE.Mesh(new THREE.SphereBufferGeometry(0.5, 16, 16,), material);
+sphere.position.x = -1.5
+const plane = new THREE.Mesh(new THREE.PlaneBufferGeometry(1, 1, 50, 50), material)
+plane.geometry.setAttribute('uv2', new THREE.BufferAttribute(plane.geometry.attributes.uv.array, 2))
+const torus = new THREE.Mesh(new THREE.TorusBufferGeometry(0.5, 0.2, 16, 32), material)
+torus.position.x = 1.5
+
+scene.add(sphere)
+scene.add(plane)
+scene.add(torus)
 
 const parameters = {
     color: 0xff0000,
@@ -73,9 +88,9 @@ const parameters = {
 gui.addColor(parameters, 'color').onChange((c) => material.color.set(c))
 gui.add(parameters, 'spin')
 
-gui.add(mesh.position, 'y', -3, 3, 0.01);
-gui.add(mesh, 'visible');
-gui.add(material, 'wireframe');
+// gui.add(mesh.position, 'y', -3, 3, 0.01);
+// gui.add(mesh, 'visible');
+// gui.add(material, 'wireframe');
 
 
 const sizes = {

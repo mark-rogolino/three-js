@@ -1,18 +1,43 @@
 import './style.css'
 import * as THREE from 'three'
-// import gsap from 'gsap'
+import gsap from 'gsap'
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
+import * as dat from 'dat.gui'
+
+const gui = new dat.GUI();
+
+
 
 
 const canvas = document.querySelector('.webgl')
 
 const scene = new THREE.Scene();
 
-const geometry = new THREE.BoxGeometry(1, 1, 1)
-const material = new THREE.MeshBasicMaterial({color: 0xff0000})
+const geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2)
+
+const material = new THREE.MeshBasicMaterial({
+    color: 0xff0000
+    // wireframe: true
+
+})
 
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh)
+
+const parameters = {
+    color: 0xff0000,
+    spin: () => {
+        gsap.to(mesh.rotation, {duration:1, y: mesh.rotation.y + 10})
+    }
+}
+
+gui.addColor(parameters, 'color').onChange((c) => material.color.set(c))
+gui.add(parameters, 'spin')
+
+gui.add(mesh.position, 'y', -3, 3, 0.01);
+gui.add(mesh, 'visible');
+gui.add(material, 'wireframe');
+
 
 const sizes = {
     width: window.innerWidth,

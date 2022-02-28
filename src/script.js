@@ -6,8 +6,46 @@ import * as dat from 'dat.gui'
 
 const gui = new dat.GUI();
 
+// Use Image
+// const image = new Image()
+// const texture = new THREE.Texture(image)
+// image.onload = () => {
+//     texture.needsUpdate = true;    
+// }
+
+// image.src = "Wood_Panel_003/basecolor.jpg"
+
+const loadingManager = new THREE.LoadingManager();
+loadingManager.onStart = () => {
+    console.log('start')
+}
+
+loadingManager.onLoaded = () => {
+    console.log('loaded')
+}
+
+loadingManager.onProgress = () => {
+    console.log('progress')
+}
+
+loadingManager.onError = () => {
+    console.log('error')
+}
 
 
+const textureLoader = new THREE.TextureLoader(loadingManager)
+const texture = textureLoader.load("Wood_Panel_003/basecolor.jpg")
+// texture.repeat.x = 2
+// texture.repeat.y = 3
+
+// texture.offset.x = 0.2
+// texture.rotation = 1
+// texture.center.x = 0.5
+
+// texture.wrapS = THREE.MirroredRepeatWrapping
+// texture.wrapT = THREE.RepeatWrapping
+
+texture.magFilter = THREE.LinearFilter
 
 const canvas = document.querySelector('.webgl')
 
@@ -16,9 +54,10 @@ const scene = new THREE.Scene();
 const geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2)
 
 const material = new THREE.MeshBasicMaterial({
-    color: 0xff0000
-    // wireframe: true
+    // color: 0xff0000
+    map: texture
 
+    // wireframe: true
 })
 
 const mesh = new THREE.Mesh(geometry, material);
@@ -44,7 +83,7 @@ const sizes = {
     height: window.innerHeight
 }
 
-
+// Resize Event
 window.addEventListener('resize', () => {
     console.log('resized')
     sizes.width = window.innerWidth;

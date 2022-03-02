@@ -8,34 +8,6 @@ import { TextBufferGeometry } from 'three'
 const gui = new dat.GUI();
 
 
-const fontLoader = new THREE.FontLoader();
-
-const font = fontLoader.load(
-    'fonts/helvetiker_regular.typeface.json',
-    function(font) {
-        // console.log(font)
-        const textGeometry = new THREE.TextBufferGeometry(
-            'Hello Three.js',
-            {
-                font: font,
-                size: 0.5,
-                height: 0.2,
-                curveSegments: 12,
-                bevelEnabled : true,
-                bevelThickness: 0.03,
-                bevelSize: 0.02,
-                bevelOffset: 0,
-                bevelSegments: 4
-            }
-        )
-        // material.wireframe = true;
-        const textMesh = new THREE.Mesh(textGeometry, material);
-
-        textGeometry.center();
-        scene.add(textMesh)
-    }
-)
-
 const loader = new THREE.TextureLoader()
 const matcapTexture = loader.load('textures/matcaps/1.png')
 
@@ -43,37 +15,50 @@ const canvas = document.querySelector('.webgl')
 
 const scene = new THREE.Scene(); 
 
-// const axesHelper = new THREE.AxesHelper()
-// scene.add(axesHelper)
-
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
 scene.add(ambientLight)
 
-const pointLight = new THREE.PointLight(0xffffff, 0.5)
-pointLight.position.set(2, 3, 4)
-scene.add(pointLight)
+// const directionalLight = new THREE.DirectionalLight(0xff00ff, 0.5);
+// directionalLight.position.set(1, 0.25, 0)
+// scene.add(directionalLight)
+// const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight)
+// scene.add(directionalLightHelper)
 
-const material = new THREE.MeshMatcapMaterial();
-material.matcap = matcapTexture
 
-const torus = new THREE.TorusGeometry(0.3, 0.2, 8, 32);
-const torusMaterial = new THREE.MeshMatcapMaterial({matcap: matcapTexture})
+// const hemisphereLight = new THREE.HemisphereLight( 0xff0000, 0x080820, 0.5 );
+// scene.add( hemisphereLight );
 
-for(let i = 0; i < 100; i++) {
-    let torusMesh = new THREE.Mesh(torus, torusMaterial)
-    torusMesh.position.x = (Math.random() - 0.5) * 10
-    torusMesh.position.y = (Math.random() - 0.5) * 10
-    torusMesh.position.z = (Math.random() - 0.5) * 10
+// const light = new THREE.PointLight( 0xff0000, 1, 100 );
+// light.position.set( 5, 5, 5 );
+// scene.add( light );
 
-    torusMesh.rotation.x = Math.random() * Math.PI;
-    torusMesh.rotation.y = Math.random() * Math.PI;
+const rectLight = new THREE.RectAreaLight( 0xffffff, 0.5,  1, 1 );
+scene.add( rectLight )
 
-    let scale = Math.random()
-    torusMesh.scale.set(scale, scale, scale)
+const material = new THREE.MeshStandardMaterial();
+material.roughness = 0.4;
+material.side = THREE.DoubleSide
 
-    scene.add(torusMesh)
-    
-}
+const plane = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), material)
+scene.add(plane)
+plane.position.y = -1
+plane.rotation.x = Math.PI / 2;
+
+
+const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 16), material)
+scene.add(sphere)
+sphere.position.x = -1.5
+
+const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1), material)
+scene.add(cube)
+
+const torus = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.3, 8, 32), material)
+scene.add(torus)
+torus.position.x = 1.5
+
+
+
+
 
 
 const parameters = {
